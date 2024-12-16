@@ -34,13 +34,6 @@ type System interface {
 // Enables mipix by tinne26.
 var MipixSupport = false
 
-// Struct for `App`.
-type App struct {
-	World    *ecs.World  // Stores a world from arche ECS.
-	Schedule []System    // Stores systems.
-	runner   ebiten.Game // Stores a ebiten game.
-}
-
 // Creates a new `App` with a world, systems, runner.
 func New(w *ecs.World, s []System, r ebiten.Game) *App {
 	app := new(App)
@@ -56,6 +49,13 @@ func New(w *ecs.World, s []System, r ebiten.Game) *App {
 	}
 
 	return app
+}
+
+// Struct for `App`.
+type App struct {
+	World    *ecs.World  // Stores a world from arche ECS.
+	Schedule []System    // Stores systems.
+	runner   ebiten.Game // Stores a ebiten game.
 }
 
 // -- general --
