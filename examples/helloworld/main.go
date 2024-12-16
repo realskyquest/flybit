@@ -1,8 +1,9 @@
 package main
 
 import (
-	"flybit"
-	"flybit/examples/helloworld/helloworld"
+	"github.com/realskyquest/flybit"
+	"github.com/realskyquest/flybit/examples/helloworld/helloworld"
+
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"

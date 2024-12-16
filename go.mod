@@ -1,4 +1,4 @@
-module flybit
+module github.com/realskyquest/flybit
 
 go 1.23.3
 
