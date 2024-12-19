@@ -17,7 +17,7 @@ var (
 	debug       = flag.Bool("flydebug", false, "enable debug mode for flybit")
 )
 
-// -- schedule --
+// -- Schedule --
 
 // Interface for system.
 type System interface {
@@ -29,10 +29,15 @@ type System interface {
 	Draw(w *ecs.World)
 }
 
-// -- App --
-
 // Enables mipix by tinne26.
 var MipixSupport = false
+
+// Struct for `App`.
+type App struct {
+	World    *ecs.World  // Stores a world from arche ECS.
+	Schedule []System    // Stores systems.
+	runner   ebiten.Game // Stores a ebiten game.
+}
 
 // Creates a new `App` with a world, systems, runner.
 func New(w *ecs.World, s []System, r ebiten.Game) *App {
@@ -51,14 +56,7 @@ func New(w *ecs.World, s []System, r ebiten.Game) *App {
 	return app
 }
 
-// Struct for `App`.
-type App struct {
-	World    *ecs.World  // Stores a world from arche ECS.
-	Schedule []System    // Stores systems.
-	runner   ebiten.Game // Stores a ebiten game.
-}
-
-// -- general --
+// -- App --
 
 // Runs the `App` by calling its `Runner`.
 func (a *App) Run() {
@@ -107,12 +105,15 @@ func (a *App) Quit() bool {
 	return ebiten.IsWindowBeingClosed()
 }
 
-// -- window --
+// -- Window --
 
 // Wrapper for `ebiten.DroppedFiles` (if info, ok := g.Flybit.FileDropped(); ok {}).
 func (a *App) FileDropped() (fs.FS, bool) {
 	file := ebiten.DroppedFiles()
 	if file != nil {
+		if *debug {
+			log.Info().Str(debugPrefix, "Files dropped").Send()
+		}
 		return file, true
 	}
 
