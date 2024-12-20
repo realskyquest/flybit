@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/realskyquest/flybit"
-	"github.com/realskyquest/flybit/examples/helloworld/helloworld"
+	"github.com/realskyquest/flybit/v2"
+	"github.com/realskyquest/flybit/v2/examples/helloworld/helloworld"
 
 	"fmt"
 

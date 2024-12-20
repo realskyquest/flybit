@@ -2,8 +2,8 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/realskyquest/flybit"
-	"github.com/realskyquest/flybit/examples/gamestate/gamestate"
+	"github.com/realskyquest/flybit/v2"
+	"github.com/realskyquest/flybit/v2/examples/gamestate/gamestate"
 )
 
 type Game struct {

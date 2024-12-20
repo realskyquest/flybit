@@ -2,7 +2,7 @@ package gamestate
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/realskyquest/flybit/cloudbit"
+	"github.com/realskyquest/flybit/v2/cloudbit"
 )
 
 type MyAppState struct {

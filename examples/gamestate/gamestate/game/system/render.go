@@ -6,7 +6,7 @@ import (
 
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
-	"github.com/realskyquest/flybit/examples/gamestate/gamestate"
+	"github.com/realskyquest/flybit/v2/examples/gamestate/gamestate"
 )
 
 // Handle all rendering

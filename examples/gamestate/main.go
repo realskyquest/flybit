@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/realskyquest/flybit/examples/gamestate/gamestate/game"
+	"github.com/realskyquest/flybit/v2/examples/gamestate/gamestate/game"
 )
 
 func main() {

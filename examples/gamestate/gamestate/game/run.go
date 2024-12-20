@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/mlange-42/arche/ecs"
-	"github.com/realskyquest/flybit"
-	"github.com/realskyquest/flybit/cloudbit"
-	"github.com/realskyquest/flybit/examples/gamestate/gamestate"
-	"github.com/realskyquest/flybit/examples/gamestate/gamestate/game/system"
+	"github.com/realskyquest/flybit/v2"
+	"github.com/realskyquest/flybit/v2/cloudbit"
+	"github.com/realskyquest/flybit/v2/examples/gamestate/gamestate"
+	"github.com/realskyquest/flybit/v2/examples/gamestate/gamestate/game/system"
 )
 
 func Run() {
