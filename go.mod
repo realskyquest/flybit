@@ -1,6 +1,6 @@
 module github.com/realskyquest/flybit
 
-go 1.23.3
+go 1.23.4
 
 require github.com/hajimehoshi/ebiten/v2 v2.8.5
 
