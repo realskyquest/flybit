@@ -29,7 +29,7 @@ func (s *Render) Draw(world *ecs.World) {
 	canvas := s.canvas.Get()
 
 	fmt.Println(appState.Cloud.Stack())
-	switch appState.Cloud.Current() {
+	switch appState.Cloud.Current().State {
 	case gamestate.LoadingScreen:
 		canvas.Image.Fill(color.White)
 	case gamestate.MainMenu:

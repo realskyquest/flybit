@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/mlange-42/arche/ecs"
 	"github.com/realskyquest/flybit"
 	"github.com/realskyquest/flybit/cloudbit"
@@ -10,19 +12,20 @@ import (
 
 func Run() {
 	runner := new(Game)
+	world := ecs.NewWorld()
 
 	state := cloudbit.New(
-		cloudbit.State(gamestate.LoadingScreen),
-		cloudbit.State(gamestate.MainMenu),
-		cloudbit.State(gamestate.InGame),
-		cloudbit.State(gamestate.Download),
+		cloudbit.Droplet{State: cloudbit.State(gamestate.LoadingScreen), Enter: func(w *ecs.World) { fmt.Println("Enter 1") }, Leave: func(w *ecs.World) { fmt.Println("Leave 1") }},
+		cloudbit.Droplet{State: cloudbit.State(gamestate.MainMenu), Enter: nil, Leave: nil},
+		cloudbit.Droplet{State: cloudbit.State(gamestate.InGame), Enter: nil, Leave: nil},
+		cloudbit.Droplet{State: cloudbit.State(gamestate.Download), Enter: nil, Leave: nil},
 	)
-	state.SwitchTo(gamestate.LoadingScreen)
+	state.SwitchTo(&world, gamestate.LoadingScreen)
+
 	runner.AppState = gamestate.MyAppState{
 		Cloud: state,
 	}
 
-	world := ecs.NewWorld()
 	schedule := []flybit.System{
 		&system.Input{},
 		&system.Render{},

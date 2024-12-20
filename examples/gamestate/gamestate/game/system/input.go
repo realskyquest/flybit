@@ -21,14 +21,14 @@ func (s *Input) Load(world *ecs.World) {
 func (s *Input) Update(world *ecs.World) {
 	appState := s.appState.Get()
 
-	if inpututil.IsKeyJustPressed(ebiten.Key1) && appState.Cloud.Current() != gamestate.LoadingScreen {
-		appState.Cloud.SwitchTo(gamestate.LoadingScreen)
-	} else if inpututil.IsKeyJustPressed(ebiten.Key2) && appState.Cloud.Current() != gamestate.MainMenu {
-		appState.Cloud.SwitchTo(gamestate.MainMenu)
-	} else if inpututil.IsKeyJustPressed(ebiten.Key3) && appState.Cloud.Current() != gamestate.InGame {
-		appState.Cloud.SwitchTo(gamestate.InGame)
-	} else if inpututil.IsKeyJustPressed(ebiten.Key4) && appState.Cloud.Current() != gamestate.Download {
-		appState.Cloud.SwitchTo(gamestate.Download)
+	if inpututil.IsKeyJustPressed(ebiten.Key1) && appState.Cloud.Current().State != gamestate.LoadingScreen {
+		appState.Cloud.SwitchTo(world, gamestate.LoadingScreen)
+	} else if inpututil.IsKeyJustPressed(ebiten.Key2) && appState.Cloud.Current().State != gamestate.MainMenu {
+		appState.Cloud.SwitchTo(world, gamestate.MainMenu)
+	} else if inpututil.IsKeyJustPressed(ebiten.Key3) && appState.Cloud.Current().State != gamestate.InGame {
+		appState.Cloud.SwitchTo(world, gamestate.InGame)
+	} else if inpututil.IsKeyJustPressed(ebiten.Key4) && appState.Cloud.Current().State != gamestate.Download {
+		appState.Cloud.SwitchTo(world, gamestate.Download)
 	}
 }
 
