@@ -1,6 +1,6 @@
 # Flybit
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/realskyquest/flybit.svg)](https://pkg.go.dev/github.com/realskyquest/flybit)
+[![Go Reference](https://pkg.go.dev/badge/github.com/realskyquest/flybit.svg)](https://pkg.go.dev/github.com/realskyquest/flybit/v2)
 
 A game framework to assist the development of [Ebitengine](https://github.com/hajimehoshi/ebiten) games.
 
