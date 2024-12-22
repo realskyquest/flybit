@@ -5,7 +5,7 @@ go 1.23.4
 require github.com/hajimehoshi/ebiten/v2 v2.8.5
 
 require (
-	github.com/mlange-42/arche v0.13.3
+	github.com/mlange-42/arche v0.14.0
 	github.com/rs/zerolog v1.33.0
 	github.com/tinne26/mipix v0.0.0-20241004174150-18386fdea7b3
 )
