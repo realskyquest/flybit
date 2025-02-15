@@ -1,0 +1,6 @@
+version: '3'
+
+tasks:
+  examples:
+    cmds:
+        - go run ./examples/helloworld/main.go
