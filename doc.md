@@ -1,6 +1,7 @@
 # Doc
 
-Main
+Game
+- Canvas
 - App
     - world *ecs.World
     - schedule []System

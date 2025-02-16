@@ -7,7 +7,7 @@ import (
 
 func (g *Game) Load() {
 	for _, s := range g.App.schedule {
-		if s.ScheduleLabel == LOAD {
+		if s.ScheduleLabel == LOAD && s.State == 0 {
 			s.System(g.App.world)
 		}
 	}
@@ -15,7 +15,7 @@ func (g *Game) Load() {
 
 func (g *Game) Update() error {
 	for _, s := range g.App.schedule {
-		if s.ScheduleLabel == UPDATE {
+		if s.ScheduleLabel == UPDATE && (s.State == 0 || s.State == g.App.appState) {
 			s.System(g.App.world)
 		}
 	}
@@ -24,8 +24,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.Canvas = screen
 	for _, s := range g.App.schedule {
-		if s.ScheduleLabel == DRAW {
+		if s.ScheduleLabel == DRAW && (s.State == 0 || s.State == g.App.appState) {
 			s.System(g.App.world)
 		}
 	}
@@ -33,7 +34,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Exit() {
 	for _, s := range g.App.schedule {
-		if s.ScheduleLabel == EXIT {
+		if s.ScheduleLabel == EXIT && s.State == 0 {
 			s.System(g.App.world)
 		}
 	}
@@ -44,17 +45,43 @@ func New(game ebiten.Game) *App {
 	app := &App{
 		world: &world,
 	}
-	ecs.AddResource(&world, &game)
 
 	return app
+}
+
+func (a *App) GetWorld() *ecs.World {
+	return a.world
 }
 
 func (a *App) GetSystems() []System {
 	return a.schedule
 }
 
+func (a *App) SetState(state uint8) {
+	if a.appState != state {
+		for _, s := range a.schedule {
+			if s.ScheduleLabel == EXIT && s.State == a.appState {
+				s.System(a.world)
+			}
+		}
+		for _, s := range a.schedule {
+			if s.ScheduleLabel == LOAD && s.State == state {
+				s.System(a.world)
+			}
+		}
+
+		a.appState = state
+	}
+}
+
 func (a *App) AddSystems(scheduleLabel uint8, systems ...func(world *ecs.World)) {
 	for _, s := range systems {
-		a.schedule = append(a.schedule, System{ScheduleLabel: scheduleLabel, System: s})
+		a.schedule = append(a.schedule, System{State: 0, ScheduleLabel: scheduleLabel, System: s})
+	}
+}
+
+func (a *App) AddSystemsOnEnter(state uint8, scheduleLabel uint8, systems ...func(world *ecs.World)) {
+	for _, s := range systems {
+		a.schedule = append(a.schedule, System{State: state, ScheduleLabel: scheduleLabel, System: s})
 	}
 }
