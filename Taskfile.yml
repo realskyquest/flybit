@@ -1,6 +1,9 @@
 version: '3'
 
 tasks:
-  examples:
-    cmds:
-        - go run ./examples/helloworld/main.go
+    example-helloworld:
+        cmds:
+            - go run ./examples/helloworld/main.go
+    example-states:
+        cmds:
+            - go run ./examples/state/states.go

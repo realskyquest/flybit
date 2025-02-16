@@ -5,11 +5,22 @@ import (
 	"github.com/mlange-42/arche/ecs"
 )
 
+// schedules
 const (
 	LOAD uint8 = iota
 	UPDATE
 	DRAW
 	EXIT
+	ONLOAD
+	ONTRANSITION
+	ONEXIT
+)
+
+// run conditions
+const (
+	NOCONDITION uint8 = iota
+	INSTATE
+	STATECHANGED
 )
 
 type Game struct {
@@ -27,5 +38,6 @@ type App struct {
 type System struct {
 	State         uint8
 	ScheduleLabel uint8
-	System        func(world *ecs.World)
+	RunCondition  uint8
+	Run           func(world *ecs.World)
 }

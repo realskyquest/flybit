@@ -31,7 +31,7 @@ func main() {
 	ebiten.SetWindowTitle("helloworld")
 
 	game := &Game{}
-	app := flybit.New(game)
+	app := flybit.New(0, game)
 	ecs.AddResource(app.GetWorld(), game)
 
 	app.AddSystems(flybit.LOAD, LoadRes)
