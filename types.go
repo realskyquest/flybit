@@ -33,6 +33,12 @@ type App struct {
 	appState uint8
 	world    *ecs.World
 	schedule []System
+	subApps  []SubApp
+}
+
+type SubApp struct {
+	world    *ecs.World
+	schedule []System
 }
 
 type System struct {

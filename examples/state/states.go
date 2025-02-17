@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
 	"github.com/realskyquest/flybit/v3"
@@ -23,9 +22,6 @@ type MenuData struct {
 
 type Game struct {
 	flybit.Game
-	font       *text.GoTextFace
-	myMsg      string
-	msgX, msgY float64
 }
 
 var (
@@ -37,10 +33,20 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 }
 
 func main() {
-	ebiten.SetWindowTitle("helloworld")
+	ebiten.SetWindowTitle("states")
 
 	game := &Game{}
-	app := flybit.New(MENU, game)
+
+	subWorld := ecs.NewWorld()
+	subApp0 := flybit.NewSubApp(&subWorld)
+	{
+		subApp0.AddSystemsRunIf(flybit.UPDATE, MENU, flybit.INSTATE, runOnSub)
+	}
+
+	world := ecs.NewWorld()
+	app := flybit.NewApp(MENU, &world, game)
+	app.AddSubApps(subApp0)
+
 	ecs.AddResource(app.GetWorld(), game)
 
 	{
@@ -63,6 +69,10 @@ func main() {
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
+}
+
+func runOnSub(world *ecs.World) {
+	fmt.Println("SUB")
 }
 
 func setup(world *ecs.World) {
