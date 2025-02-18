@@ -1,6 +1,8 @@
 package flybit
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/mlange-42/arche/ecs"
 )
@@ -11,16 +13,21 @@ const (
 	UPDATE
 	DRAW
 	EXIT
-	ONLOAD
-	ONTRANSITION
-	ONEXIT
+	ON_LOAD
+	ON_TRANSITION
+	ON_EXIT
 )
 
 // run conditions
 const (
-	NOCONDITION uint8 = iota
-	INSTATE
-	STATECHANGED
+	NO_CONDITION uint8 = iota
+	IN_STATE
+	STATE_CHANGED
+)
+
+const (
+	headlessTps      = 60                        // Ticks per second (default is 60)
+	headlessTimestep = time.Second / headlessTps // Duration for each tick (1000 ms / 60 = 16.666 ms)
 )
 
 type Game struct {

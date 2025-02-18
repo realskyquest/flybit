@@ -6,4 +6,7 @@ tasks:
             - go run ./examples/helloworld/main.go
     example-states:
         cmds:
-            - go run ./examples/state/states.go
+            - go run ./examples/state/main.go
+    example-event:
+        cmds:
+            - go run ./examples/event/main.go

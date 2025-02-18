@@ -33,19 +33,9 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 }
 
 func main() {
-	ebiten.SetWindowTitle("states")
-
 	game := &Game{}
-
-	subWorld := ecs.NewWorld()
-	subApp0 := flybit.NewSubApp(&subWorld)
-	{
-		subApp0.AddSystemsRunIf(flybit.UPDATE, MENU, flybit.INSTATE, runOnSub)
-	}
-
 	world := ecs.NewWorld()
 	app := flybit.NewApp(MENU, &world, game)
-	app.AddSubApps(subApp0)
 
 	ecs.AddResource(app.GetWorld(), game)
 
@@ -53,26 +43,23 @@ func main() {
 		app.AddSystems(flybit.LOAD, setup)
 		app.AddSystems(flybit.UPDATE, handleInput)
 
-		app.AddSystemsRunIf(flybit.UPDATE, DEFAULT, flybit.STATECHANGED, handleStateChange)
+		app.AddSystemsRunIf(flybit.UPDATE, DEFAULT, flybit.STATE_CHANGED, handleStateChange)
 
 		app.AddSystemsOnLoad(MENU, setupMenu)
-		app.AddSystemsRunIf(flybit.UPDATE, MENU, flybit.INSTATE, menu)
+		app.AddSystemsRunIf(flybit.UPDATE, MENU, flybit.IN_STATE, menu)
 		app.AddSystemsOnExit(MENU, cleanupMenu)
 
 		app.AddSystemsOnLoad(INGAME, setupGame)
-		app.AddSystemsRunIf(flybit.UPDATE, INGAME, flybit.INSTATE, movement, changeColor)
+		app.AddSystemsRunIf(flybit.UPDATE, INGAME, flybit.IN_STATE, movement, changeColor)
 	}
 
 	game.App = *app
 	game.Load()
 
+	ebiten.SetWindowTitle("event")
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
-}
-
-func runOnSub(world *ecs.World) {
-	fmt.Println("SUB")
 }
 
 func setup(world *ecs.World) {

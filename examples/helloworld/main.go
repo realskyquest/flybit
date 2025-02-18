@@ -73,5 +73,6 @@ func DrawText(world *ecs.World) {
 	g := GameRes.Get()
 
 	op := &text.DrawOptions{}
+	op.GeoM.Translate(10, 10)
 	text.Draw(g.Canvas, g.myMsg, g.font, op)
 }
