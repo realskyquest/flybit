@@ -32,6 +32,8 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 	return outsideWidth, OutsideHeight
 }
 
+func (g *Game) Draw(screen *ebiten.Image) {}
+
 func main() {
 	game := &Game{}
 	world := ecs.NewWorld()
@@ -43,14 +45,14 @@ func main() {
 		app.AddSystems(flybit.LOAD, setup)
 		app.AddSystems(flybit.UPDATE, handleInput)
 
-		app.AddSystemsRunIf(flybit.UPDATE, DEFAULT, flybit.STATE_CHANGED, handleStateChange)
+		app.AddSystemsRunIf(DEFAULT, flybit.STATE_CHANGED, handleStateChange)
 
 		app.AddSystemsOnLoad(MENU, setupMenu)
-		app.AddSystemsRunIf(flybit.UPDATE, MENU, flybit.IN_STATE, menu)
+		app.AddSystemsRunIf(MENU, flybit.IN_STATE, menu)
 		app.AddSystemsOnExit(MENU, cleanupMenu)
 
 		app.AddSystemsOnLoad(INGAME, setupGame)
-		app.AddSystemsRunIf(flybit.UPDATE, INGAME, flybit.IN_STATE, movement, changeColor)
+		app.AddSystemsRunIf(INGAME, flybit.IN_STATE, movement, changeColor)
 	}
 
 	game.App = *app
@@ -95,15 +97,12 @@ func cleanupMenu(world *ecs.World) {
 
 func setupGame(world *ecs.World) {
 	fmt.Println("Setup Game")
-
 }
 
 func movement(world *ecs.World) {
 	fmt.Println("movement")
-
 }
 
 func changeColor(world *ecs.World) {
 	fmt.Println("change color")
-
 }

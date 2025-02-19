@@ -17,11 +17,6 @@ func (g *Game) Update() error {
 	return nil
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
-	g.Canvas = screen
-	runSchedule(&g.App, DRAW)
-}
-
 func (g *Game) Exit() {
 	runScheduleOnce(&g.App, EXIT, ON_EXIT)
 }

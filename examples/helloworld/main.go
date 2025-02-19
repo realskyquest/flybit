@@ -27,6 +27,12 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 	return outsideWidth, OutsideHeight
 }
 
+func (g *Game) Draw(screen *ebiten.Image) {
+	op := &text.DrawOptions{}
+	op.GeoM.Translate(10, 10)
+	text.Draw(g.Canvas, g.myMsg, g.font, op)
+}
+
 func main() {
 	ebiten.SetWindowTitle("helloworld")
 
@@ -37,7 +43,6 @@ func main() {
 
 	app.AddSystems(flybit.LOAD, LoadRes)
 	app.AddSystems(flybit.UPDATE, UpdateTextPosition)
-	app.AddSystems(flybit.DRAW, DrawText)
 
 	game.App = *app
 	game.Load()
@@ -66,13 +71,4 @@ func LoadRes(world *ecs.World) {
 	g.myMsg = "Hello World!"
 }
 
-func UpdateTextPosition(world *ecs.World) {
-}
-
-func DrawText(world *ecs.World) {
-	g := GameRes.Get()
-
-	op := &text.DrawOptions{}
-	op.GeoM.Translate(10, 10)
-	text.Draw(g.Canvas, g.myMsg, g.font, op)
-}
+func UpdateTextPosition(world *ecs.World) {}

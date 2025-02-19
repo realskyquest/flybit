@@ -29,6 +29,8 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 	return outsideWidth, OutsideHeight
 }
 
+func (g *Game) Draw(screen *ebiten.Image) {}
+
 func main() {
 	game := &Game{}
 	world := ecs.NewWorld()

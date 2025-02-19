@@ -11,7 +11,6 @@ import (
 const (
 	LOAD uint8 = iota
 	UPDATE
-	DRAW
 	EXIT
 	ON_LOAD
 	ON_TRANSITION
