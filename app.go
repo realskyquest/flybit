@@ -7,24 +7,10 @@ import (
 	"github.com/mlange-42/arche/ecs"
 )
 
-func (g *Game) Load() {
-	runScheduleOnce(&g.App, LOAD, ON_LOAD)
-}
-
-func (g *Game) Update() error {
-	runSchedule(&g.App, UPDATE)
-
-	return nil
-}
-
-func (g *Game) Exit() {
-	runScheduleOnce(&g.App, EXIT, ON_EXIT)
-}
-
 func NewApp(state uint8, world *ecs.World, game ebiten.Game) *App {
 	app := &App{
-		appState: state,
-		world:    world,
+		appStatePtr: &state,
+		worldPtr:    world,
 	}
 
 	return app
@@ -32,7 +18,7 @@ func NewApp(state uint8, world *ecs.World, game ebiten.Game) *App {
 
 func NewSubApp(world *ecs.World) *SubApp {
 	subApp := &SubApp{
-		world: world,
+		worldPtr: world,
 	}
 
 	return subApp
@@ -60,27 +46,63 @@ func (a *App) HeadlessRun() {
 	}
 }
 
+func (a *App) GetState() uint8 {
+	return *a.appStatePtr
+}
+
+func (a *App) GetSubState(stateID uint8) uint8 {
+	var state *uint8
+	for _, appSubState := range a.appSubStatesPtr {
+		if *appSubState.stateIDPtr == stateID {
+			state = appSubState.statePtr
+		}
+	}
+	return *state
+}
+
 func (a *App) GetWorld() *ecs.World {
-	return a.world
+	return a.worldPtr
 }
 
 func (a *App) SetState(state uint8) {
-	if a.appState != state {
+	if *a.appStatePtr != state {
 		// Runs (ONEXIT schedule) systems with the current state
-		runScheduleOnceStateChanged(a, a.appState, ON_EXIT, NO_CONDITION)
+		runScheduleOnceStateChanged(a, *a.appStatePtr, ON_EXIT, NO_CONDITION)
 		// Runs (ONTRANSITION schedule) systems with the next state
 		runScheduleOnceStateChanged(a, state, ON_TRANSITION, NO_CONDITION)
 		// Runs (ONLOAD schedule) systems with the next state
 		runScheduleOnceStateChanged(a, state, ON_LOAD, NO_CONDITION)
 
-		a.appState = state
+		a.appStatePtr = &state
 		// Runs systems when state is changed
 		runScheduleOnceStateChanged(a, 0, UPDATE, STATE_CHANGED)
 	}
 }
 
+func (a *App) SetSubState(stateID, state uint8) {
+	for _, appSubState := range a.appSubStatesPtr {
+		if *appSubState.stateIDPtr == stateID {
+			appSubState.statePtr = &state
+		}
+	}
+}
+
+func (a *App) AddSubState(appState, stateID, state uint8) {
+	a.appSubStatesPtr = append(a.appSubStatesPtr, &SubState{stateParentPtr: &appState, stateIDPtr: &stateID, statePtr: &state})
+}
+
+func (a *App) AddSubStateSystems(stateID, state uint8, systems ...func(world *ecs.World)) {
+	for _, appSubState := range a.appSubStatesPtr {
+		if *appSubState.stateIDPtr == stateID {
+			for _, s := range systems {
+				appSubState.schedulePtr = append(appSubState.schedulePtr, &System{statePtr: &state, run: s})
+			}
+		}
+	}
+}
+
 func (a *App) AddSubApps(subApps ...*SubApp) {
 	for _, sa := range subApps {
-		a.subApps = append(a.subApps, *sa)
+		a.subAppsPtr = append(a.subAppsPtr, sa)
 	}
 }

@@ -16,9 +16,15 @@ const (
 	INGAME
 )
 
-type MenuData struct {
-	msg string
-}
+const (
+	IS_PAUSED uint8 = iota
+)
+
+// IS_PAUSED
+const (
+	IS_PAUSED__PLAYING uint8 = iota
+	IS_PAUSED__PAUSED
+)
 
 type Game struct {
 	flybit.Game
@@ -38,6 +44,7 @@ func main() {
 	game := &Game{}
 	world := ecs.NewWorld()
 	app := flybit.NewApp(MENU, &world, game)
+	app.AddSubState(MENU, IS_PAUSED, IS_PAUSED__PLAYING)
 
 	ecs.AddResource(app.GetWorld(), game)
 
@@ -45,14 +52,10 @@ func main() {
 		app.AddSystems(flybit.LOAD, setup)
 		app.AddSystems(flybit.UPDATE, handleInput)
 
+		app.AddSubStateSystems(IS_PAUSED, IS_PAUSED__PLAYING, playingGame)
+		app.AddSubStateSystems(IS_PAUSED, IS_PAUSED__PAUSED, pausedGame)
+
 		app.AddSystemsRunIf(DEFAULT, flybit.STATE_CHANGED, handleStateChange)
-
-		app.AddSystemsOnLoad(MENU, setupMenu)
-		app.AddSystemsRunIf(MENU, flybit.IN_STATE, menu)
-		app.AddSystemsOnExit(MENU, cleanupMenu)
-
-		app.AddSystemsOnLoad(INGAME, setupGame)
-		app.AddSystemsRunIf(INGAME, flybit.IN_STATE, movement, changeColor)
 	}
 
 	game.SetApp(app)
@@ -80,29 +83,17 @@ func handleInput(world *ecs.World) {
 		g.GetApp().SetState(MENU)
 	} else if inpututil.IsKeyJustPressed(ebiten.Key2) {
 		g.GetApp().SetState(INGAME)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyT) {
+		g.GetApp().SetSubState(IS_PAUSED, IS_PAUSED__PLAYING)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyY) {
+		g.GetApp().SetSubState(IS_PAUSED, IS_PAUSED__PAUSED)
 	}
 }
 
-func setupMenu(world *ecs.World) {
-	fmt.Println("Setup Menu")
+func playingGame(world *ecs.World) {
+	fmt.Println("Playing")
 }
 
-func menu(world *ecs.World) {
-	fmt.Println("Menu")
-}
-
-func cleanupMenu(world *ecs.World) {
-	fmt.Println("Cleanup Menu")
-}
-
-func setupGame(world *ecs.World) {
-	fmt.Println("Setup Game")
-}
-
-func movement(world *ecs.World) {
-	fmt.Println("movement")
-}
-
-func changeColor(world *ecs.World) {
-	fmt.Println("change color")
+func pausedGame(world *ecs.World) {
+	fmt.Println("Paused")
 }

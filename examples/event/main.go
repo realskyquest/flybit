@@ -18,6 +18,7 @@ type MenuData struct {
 }
 
 type Game struct {
+	App flybit.App
 	flybit.Game
 }
 

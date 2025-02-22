@@ -30,26 +30,35 @@ const (
 )
 
 type Game struct {
-	running bool
-	Canvas  *ebiten.Image
-	App     App
+	running   bool // DOES NOTHING
+	canvasPtr *ebiten.Image
+	appPtr    *App
 }
 
 type App struct {
-	appState uint8
-	world    *ecs.World
-	schedule []System
-	subApps  []SubApp
+	appStatePtr     *uint8
+	appSubStatesPtr []*SubState
+	worldPtr        *ecs.World
+	schedulePtr     []*System
+	subAppsPtr      []*SubApp
 }
 
 type SubApp struct {
-	world    *ecs.World
-	schedule []System
+	worldPtr    *ecs.World
+	schedulePtr []*System
 }
 
 type System struct {
-	State         uint8
-	ScheduleLabel uint8
-	RunCondition  uint8
-	Run           func(world *ecs.World)
+	statePtr         *uint8
+	scheduleLabelPtr *uint8
+	runConditionPtr  *uint8
+	run              func(world *ecs.World)
+}
+
+// appState is what state they belong to for identification
+type SubState struct {
+	stateParentPtr *uint8
+	stateIDPtr     *uint8
+	statePtr       *uint8
+	schedulePtr    []*System
 }

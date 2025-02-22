@@ -10,3 +10,6 @@ tasks:
     example-event:
         cmds:
             - go run ./examples/event/main.go
+    example-substate:
+        cmds:
+            - go run ./examples/substate/main.go

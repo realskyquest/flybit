@@ -28,9 +28,11 @@ func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeigh
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.SetCanvas(screen)
+
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(10, 10)
-	text.Draw(g.Canvas, g.myMsg, g.font, op)
+	text.Draw(g.GetCanvas(), g.myMsg, g.font, op)
 }
 
 func main() {
@@ -44,7 +46,7 @@ func main() {
 	app.AddSystems(flybit.LOAD, LoadRes)
 	app.AddSystems(flybit.UPDATE, UpdateTextPosition)
 
-	game.App = *app
+	game.SetApp(app)
 	game.Load()
 
 	if err := ebiten.RunGame(game); err != nil {
