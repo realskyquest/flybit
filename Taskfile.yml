@@ -1,15 +1,17 @@
 version: '3'
 
 tasks:
-    example-helloworld:
-        cmds:
-            - go run ./examples/helloworld/main.go
-    example-states:
-        cmds:
-            - go run ./examples/state/main.go
-    example-event:
-        cmds:
-            - go run ./examples/event/main.go
-    example-substate:
-        cmds:
-            - go run ./examples/substate/main.go
+  examples:
+    cmds:
+      - echo "Run a example like this, task examples:helloworld"
+    silent: true
+
+  examples:helloworld:
+    desc: "Run basic helloworld app"
+    cmds:
+      - go run ./examples/helloworld/main.go
+
+  examples:state:
+    desc: "Run basic state app"
+    cmds:
+      - go run ./examples/state/main.go
