@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -12,65 +13,72 @@ import (
 	"github.com/realskyquest/flybit/v3"
 )
 
-type Game struct {
-	flybit.Game
-	font       *text.GoTextFace
-	myMsg      string
-	msgX, msgY float64
+type HelloworldGame struct {
+	canvas *ebiten.Image
+	source *text.GoTextFaceSource
+	font   *text.GoTextFace
 }
 
+// -- ecs resources --
 var (
-	GameRes generic.Resource[Game]
+	AppRes  generic.Resource[flybit.App]
+	GameRes generic.Resource[HelloworldGame]
 )
+
+type Game struct {
+	flybit.Game
+}
 
 func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeight int) {
 	return outsideWidth, OutsideHeight
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {
-	g.SetCanvas(screen)
+func (_ *Game) Draw(screen *ebiten.Image) {
+	g := GameRes.Get()
+
+	g.canvas = screen
+	g.canvas.Fill(color.White)
 
 	op := &text.DrawOptions{}
-	op.GeoM.Translate(10, 10)
-	text.Draw(g.GetCanvas(), g.myMsg, g.font, op)
+	op.ColorScale.ScaleWithColor(color.Black)
+	text.Draw(g.canvas, "Hello World!", g.font, op)
 }
 
 func main() {
-	ebiten.SetWindowTitle("helloworld")
-
 	game := &Game{}
 	world := ecs.NewWorld()
-	app := flybit.NewApp(0, &world, game)
-	ecs.AddResource(app.GetWorld(), game)
+	app := flybit.New(0, &world)
 
-	app.AddSystems(flybit.LOAD, LoadRes)
-	app.AddSystems(flybit.UPDATE, UpdateTextPosition)
+	ecs.AddResource(&world, app)
+	ecs.AddResource(&world, &HelloworldGame{})
 
-	game.SetApp(app)
-	game.Load()
+	app.AddSystems(flybit.LOAD, loadRes, loadFonts)
 
+	game.Load(app)
+
+	ebiten.SetWindowTitle("helloworld")
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
 }
 
-func LoadRes(world *ecs.World) {
-	GameRes = generic.NewResource[Game](world)
+func loadRes(world *ecs.World) {
+	AppRes = generic.NewResource[flybit.App](world)
+	GameRes = generic.NewResource[HelloworldGame](world)
+}
+
+func loadFonts(world *ecs.World) {
 	g := GameRes.Get()
 
 	s, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
 	if err != nil {
 		log.Fatal(err)
 	}
-	mplusFaceSource := s
+	g.source = s
 
-	mplusNormalFace := &text.GoTextFace{
-		Source: mplusFaceSource,
+	g.font = &text.GoTextFace{
+		Source: s,
 		Size:   24,
 	}
-
-	g.font = mplusNormalFace
-	g.myMsg = "Hello World!"
 }
-
-func UpdateTextPosition(world *ecs.World) {}

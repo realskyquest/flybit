@@ -9,9 +9,19 @@ tasks:
   examples:helloworld:
     desc: "Run basic helloworld app"
     cmds:
-      - go run ./examples/helloworld/main.go
+      - go run ./examples/helloworld
 
   examples:state:
     desc: "Run basic state app"
     cmds:
-      - go run ./examples/state/main.go
+      - go run ./examples/state
+
+  examples:substate:
+    desc: "Run basic substate app"
+    cmds:
+      - go run ./examples/substate
+
+  examples:signal:
+    desc: "Run basic signal app"
+    cmds:
+      - go run ./examples/signal

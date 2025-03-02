@@ -1,99 +1,155 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
+	"image/color"
+	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
 	"github.com/realskyquest/flybit/v3"
 )
 
+type StateGame struct {
+	canvas *ebiten.Image
+	source *text.GoTextFaceSource
+	font   *text.GoTextFace
+	msg    string
+	bowl   string
+}
+
 const (
-	DEFAULT uint8 = iota
+	DEFAULT flybit.State = iota
 	MENU
 	INGAME
 )
 
 const (
-	IS_PAUSED uint8 = iota
+	BOWL_STATUS uint8 = iota
 )
 
-// IS_PAUSED
 const (
-	IS_PAUSED__PLAYING uint8 = iota
-	IS_PAUSED__PAUSED
+	FULL_OF_RICE flybit.State = iota
+	RICE_CRUMBS
+)
+
+// -- ecs resources --
+var (
+	AppRes  generic.Resource[flybit.App]
+	GameRes generic.Resource[StateGame]
 )
 
 type Game struct {
 	flybit.Game
 }
 
-var (
-	GameRes generic.Resource[Game]
-)
-
 func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeight int) {
 	return outsideWidth, OutsideHeight
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {}
+func (_ *Game) Draw(screen *ebiten.Image) {
+	g := GameRes.Get()
+
+	g.canvas = screen
+	g.canvas.Fill(color.White)
+
+	op := &text.DrawOptions{}
+	op.ColorScale.ScaleWithColor(color.Black)
+
+	text.Draw(g.canvas, g.msg, g.font, op)
+
+	op.GeoM.Translate(0, 24)
+
+	text.Draw(g.canvas, g.bowl, g.font, op)
+}
 
 func main() {
 	game := &Game{}
 	world := ecs.NewWorld()
-	app := flybit.NewApp(MENU, &world, game)
-	app.AddSubState(MENU, IS_PAUSED, IS_PAUSED__PLAYING)
+	app := flybit.New(MENU, &world)
+	app.AddSubState(DEFAULT, BOWL_STATUS, RICE_CRUMBS)
 
-	ecs.AddResource(app.GetWorld(), game)
+	ecs.AddResource(&world, app)
+	ecs.AddResource(&world, &StateGame{})
 
-	{
-		app.AddSystems(flybit.LOAD, setup)
-		app.AddSystems(flybit.UPDATE, handleInput)
+	app.AddSystems(flybit.LOAD, loadRes, loadFonts)
+	app.AddSystems(flybit.UPDATE, handleInput)
 
-		app.AddSubStateSystems(IS_PAUSED, IS_PAUSED__PLAYING, playingGame)
-		app.AddSubStateSystems(IS_PAUSED, IS_PAUSED__PAUSED, pausedGame)
+	app.AddSystemsRunIf(MENU, menu)
+	app.AddSystemsRunIf(INGAME, ingame)
 
-		app.AddSystemsRunIf(DEFAULT, flybit.STATE_CHANGED, handleStateChange)
-	}
+	app.AddSubStateSystems(BOWL_STATUS, RICE_CRUMBS, eatFood)
+	app.AddSubStateSystems(BOWL_STATUS, FULL_OF_RICE, fillFood)
 
-	game.SetApp(app)
-	game.Load()
+	game.Load(app)
 
-	ebiten.SetWindowTitle("event")
+	ebiten.SetWindowTitle("substate")
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
 }
 
-func setup(world *ecs.World) {
-	fmt.Println("Setup")
-	GameRes = generic.NewResource[Game](world)
+func loadRes(world *ecs.World) {
+	AppRes = generic.NewResource[flybit.App](world)
+	GameRes = generic.NewResource[StateGame](world)
+
+	a := AppRes.Get()
+	a.SetSubState(BOWL_STATUS, RICE_CRUMBS)
 }
 
-func handleStateChange(world *ecs.World) {
-	fmt.Println("STATE CHANGED")
-}
-
-func handleInput(world *ecs.World) {
+func loadFonts(world *ecs.World) {
 	g := GameRes.Get()
 
-	if inpututil.IsKeyJustPressed(ebiten.Key1) {
-		g.GetApp().SetState(MENU)
-	} else if inpututil.IsKeyJustPressed(ebiten.Key2) {
-		g.GetApp().SetState(INGAME)
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyT) {
-		g.GetApp().SetSubState(IS_PAUSED, IS_PAUSED__PLAYING)
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyY) {
-		g.GetApp().SetSubState(IS_PAUSED, IS_PAUSED__PAUSED)
+	s, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
+	if err != nil {
+		log.Fatal(err)
+	}
+	g.source = s
+
+	g.font = &text.GoTextFace{
+		Source: s,
+		Size:   24,
 	}
 }
 
-func playingGame(world *ecs.World) {
-	fmt.Println("Playing")
+func handleInput(world *ecs.World) {
+	a := AppRes.Get()
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyDigit1) {
+		a.SetState(MENU)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyDigit2) {
+		a.SetState(INGAME)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+		a.SetSubState(BOWL_STATUS, RICE_CRUMBS)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyG) {
+		a.SetSubState(BOWL_STATUS, FULL_OF_RICE)
+	}
 }
 
-func pausedGame(world *ecs.World) {
-	fmt.Println("Paused")
+func menu(world *ecs.World) {
+	g := GameRes.Get()
+
+	g.msg = "menu"
+}
+
+func ingame(world *ecs.World) {
+	g := GameRes.Get()
+
+	g.msg = "ingame"
+}
+
+func eatFood(world *ecs.World) {
+	g := GameRes.Get()
+
+	g.bowl = "the bowl is empty with crumbs of rice"
+}
+
+func fillFood(world *ecs.World) {
+	g := GameRes.Get()
+
+	g.bowl = "the bowl is filled to brim with rice"
 }

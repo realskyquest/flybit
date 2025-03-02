@@ -1,108 +1,117 @@
 package main
 
 import (
-	"fmt"
+	"bytes"
+	"image/color"
+	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
 	"github.com/realskyquest/flybit/v3"
 )
 
+type StateGame struct {
+	canvas *ebiten.Image
+	source *text.GoTextFaceSource
+	font   *text.GoTextFace
+	msg    string
+}
+
 const (
-	DEFAULT uint8 = iota
+	DEFAULT flybit.State = iota
 	MENU
 	INGAME
 )
 
-type MenuData struct {
-	msg string
-}
+// -- ecs resources --
+var (
+	AppRes  generic.Resource[flybit.App]
+	GameRes generic.Resource[StateGame]
+)
 
 type Game struct {
 	flybit.Game
 }
 
-var (
-	GameRes generic.Resource[Game]
-)
-
 func (g *Game) Layout(outsideWidth, OutsideHeight int) (screenWidth, ScreenHeight int) {
 	return outsideWidth, OutsideHeight
 }
 
-func (g *Game) Draw(screen *ebiten.Image) {}
+func (_ *Game) Draw(screen *ebiten.Image) {
+	g := GameRes.Get()
+
+	g.canvas = screen
+	g.canvas.Fill(color.White)
+
+	op := &text.DrawOptions{}
+	op.ColorScale.ScaleWithColor(color.Black)
+	text.Draw(g.canvas, g.msg, g.font, op)
+}
 
 func main() {
 	game := &Game{}
 	world := ecs.NewWorld()
-	app := flybit.NewApp(MENU, &world, game)
+	app := flybit.New(MENU, &world)
 
-	ecs.AddResource(app.GetWorld(), game)
+	ecs.AddResource(&world, app)
+	ecs.AddResource(&world, &StateGame{})
 
-	{
-		app.AddSystems(flybit.LOAD, setup)
-		app.AddSystems(flybit.UPDATE, handleInput)
+	app.AddSystems(flybit.LOAD, loadRes, loadFonts)
+	app.AddSystems(flybit.UPDATE, handleInput)
 
-		app.AddSystemsRunIf(DEFAULT, flybit.STATE_CHANGED, handleStateChange)
+	app.AddSystemsRunIf(MENU, menu)
+	app.AddSystemsRunIf(INGAME, ingame)
 
-		app.AddSystemsOnLoad(MENU, setupMenu)
-		app.AddSystemsRunIf(MENU, flybit.IN_STATE, menu)
-		app.AddSystemsOnExit(MENU, cleanupMenu)
+	game.Load(app)
 
-		app.AddSystemsOnLoad(INGAME, setupGame)
-		app.AddSystemsRunIf(INGAME, flybit.IN_STATE, movement, changeColor)
-	}
-
-	game.SetApp(app)
-	game.Load()
-
-	ebiten.SetWindowTitle("event")
+	ebiten.SetWindowTitle("state")
 	if err := ebiten.RunGame(game); err != nil {
 		panic(err)
 	}
 }
 
-func setup(world *ecs.World) {
-	fmt.Println("Setup")
-	GameRes = generic.NewResource[Game](world)
+func loadRes(world *ecs.World) {
+	AppRes = generic.NewResource[flybit.App](world)
+	GameRes = generic.NewResource[StateGame](world)
 }
 
-func handleStateChange(world *ecs.World) {
-	fmt.Println("STATE CHANGED")
-}
-
-func handleInput(world *ecs.World) {
+func loadFonts(world *ecs.World) {
 	g := GameRes.Get()
 
-	if inpututil.IsKeyJustPressed(ebiten.Key1) {
-		g.GetApp().SetState(MENU)
-	} else if inpututil.IsKeyJustPressed(ebiten.Key2) {
-		g.GetApp().SetState(INGAME)
+	s, err := text.NewGoTextFaceSource(bytes.NewReader(fonts.MPlus1pRegular_ttf))
+	if err != nil {
+		log.Fatal(err)
+	}
+	g.source = s
+
+	g.font = &text.GoTextFace{
+		Source: s,
+		Size:   24,
 	}
 }
 
-func setupMenu(world *ecs.World) {
-	fmt.Println("Setup Menu")
+func handleInput(world *ecs.World) {
+	a := AppRes.Get()
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyDigit1) {
+		a.SetState(MENU)
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyDigit2) {
+		a.SetState(INGAME)
+	}
 }
 
 func menu(world *ecs.World) {
-	fmt.Println("Menu")
+	g := GameRes.Get()
+
+	g.msg = "menu"
 }
 
-func cleanupMenu(world *ecs.World) {
-	fmt.Println("Cleanup Menu")
-}
+func ingame(world *ecs.World) {
+	g := GameRes.Get()
 
-func setupGame(world *ecs.World) {
-	fmt.Println("Setup Game")
-}
-
-func movement(world *ecs.World) {
-	fmt.Println("movement")
-}
-
-func changeColor(world *ecs.World) {
-	fmt.Println("change color")
+	g.msg = "ingame"
 }
