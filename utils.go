@@ -1,6 +1,6 @@
 package flybit
 
-import "github.com/mlange-42/arche/ecs"
+import "github.com/mlange-42/ark/ecs"
 
 // runScheduleOnce executes systems that match either of the two provided schedule labels
 // and have no run conditions. Systems must either have state 0 (global) or match the app's current state.

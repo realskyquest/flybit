@@ -3,7 +3,7 @@ package signal
 import (
 	"errors"
 
-	"github.com/mlange-42/arche/ecs"
+	"github.com/mlange-42/ark/ecs"
 )
 
 type SignalID uint16

@@ -9,8 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/mlange-42/arche/ecs"
-	"github.com/mlange-42/arche/generic"
+	"github.com/mlange-42/ark/ecs"
 	"github.com/realskyquest/flybit/v3"
 )
 
@@ -29,8 +28,8 @@ const (
 
 // -- ecs resources --
 var (
-	AppRes  generic.Resource[flybit.App]
-	GameRes generic.Resource[StateGame]
+	AppRes  ecs.Resource[flybit.App]
+	GameRes ecs.Resource[StateGame]
 )
 
 type Game struct {
@@ -75,8 +74,8 @@ func main() {
 }
 
 func loadRes(world *ecs.World) {
-	AppRes = generic.NewResource[flybit.App](world)
-	GameRes = generic.NewResource[StateGame](world)
+	AppRes = ecs.NewResource[flybit.App](world)
+	GameRes = ecs.NewResource[StateGame](world)
 }
 
 func loadFonts(world *ecs.World) {

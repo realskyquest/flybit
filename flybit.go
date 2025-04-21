@@ -1,8 +1,7 @@
 package flybit
 
 import (
-	"github.com/mlange-42/arche/ecs"
-	"github.com/mlange-42/arche/generic"
+	"github.com/mlange-42/ark/ecs"
 )
 
 // ScheduleLabel defines when a system should be executed in the game loop
@@ -47,12 +46,12 @@ type System struct {
 
 // Game manages the main game loop and system execution
 type Game struct {
-	appRes generic.Resource[App]
+	appRes ecs.Resource[App]
 }
 
 // Load initializes the game and runs LOAD and ON_LOAD systems
 func (g *Game) Load(app *App) {
-	g.appRes = generic.NewResource[App](app.worldPtr)
+	g.appRes = ecs.NewResource[App](app.worldPtr)
 	runScheduleOnce(app, LOAD, ON_LOAD)
 }
 
