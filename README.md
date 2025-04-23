@@ -10,6 +10,6 @@ This framework contains inspiration from [Bevy](https://github.com/bevyengine/be
 
 ## Features
 
-- Support for [Arche](https://github.com/mlange-42/arche) ECS
+- Support for [Ark](https://github.com/mlange-42/ark) ECS
 - Support for [Mipix](https://github.com/tinne26/mipix)
 - More coming...

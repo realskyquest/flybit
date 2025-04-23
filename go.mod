@@ -1,10 +1,12 @@
 module github.com/realskyquest/flybit/v3
 
-go 1.23.6
+go 1.24.0
+
+toolchain go1.24.2
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.6
-	github.com/mlange-42/arche v0.15.3
+	github.com/mlange-42/ark v0.4.1
 )
 
 require (
